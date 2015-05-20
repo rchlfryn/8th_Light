@@ -1,0 +1,4 @@
+I completed this programs using a pretty brute force approach. In my mind, the program was simple: generate a random number using the rand C++ function and when the file line matched that random number print it out. Well the program was just a bit more complicated than that. 
+I broke the program into smaller parts, and solved each one by one and made sure it was working before I moved onto the next one. I first read in the file, then read in line of the file, then created a random number, then printed out that random line in the file. I of course ran into smaller problems within each one but was able to in the end build a successful program.
+One problem I ran into was not being able to read from the same file twice. After a quick Google search I realized you need to reset the pointer to the head of the file if you wish to read from it again.
+Overall this program is probably not the most efficient or fastest, but it works!
