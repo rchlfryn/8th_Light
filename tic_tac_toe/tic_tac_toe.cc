@@ -7,6 +7,7 @@
 
 using namespace std;
 
+void welcome();
 //Function will display tic-tac-toe board
 void display_board();
 //Function will prompt player for move and make move
@@ -29,17 +30,11 @@ int num;
 int track;
 
 int main() {
-	char start;
-	cout << "Welcome to Tic Tac Toe \n";
-	cout << "Would you like to go first? Y or N >> ";
-	cin >> start;
-
-	if (start == 'Y' || start == 'y')
-		turn = 'X';
-	else if (start == 'N' || start == 'n')
-		turn = 'O';
 	num = 1;
-
+	char quit;
+	cout << "Welcome to Tic Tac Toe \n";
+	do{
+	welcome();
 	while (!game_over()) {
 		display_board();
 		player_turn();
@@ -57,8 +52,26 @@ int main() {
 		display_board();
 		cout << endl << endl << "You tied. Cats game. Game Over!\n";
 	}
+	cout << "\nWould you like to play another game?\n"
+		 <<"Type any single char to continue and 'Q' to quit>>";
+	cin >> quit;
+	}while(quit != 'q' || quit != 'Q');
 }
 
+void welcome(){
+	char c;
+	cout << "Would you like to go first? Y or N >> ";
+	cin >> c;
+
+	if (c == 'Y' || c == 'y')
+		turn = 'X';
+	else if (c == 'N' || c == 'n')
+		turn = 'O';
+	else{
+		cout << "Invalid input. Please try again.\n";
+		welcome();
+	}
+}
 void display_board() {
 	cout << "     |     |     " << endl;
 	cout << "  " << board[0][0] << "  |  " << board[0][1] << "  |  "
@@ -190,11 +203,26 @@ void computer_AI(int &r, int &c, int m) {
 		}
 		//Pick an empty corner
 		if (num == 4) {
-			for (int i = 0; i < 3; i += 2) {
-				for (int j = 0; j < 3; j += 2) {
-					if (board[i][j] != 'X' && board[i][j] != 'O') {
-						r = i; c = j;
-						return;
+			//If opponent picks corner, pick edge
+			if(track == 0 || track == 2 || track == 20 || track == 22){
+				for (int i = 0; i < 3; i ++) {
+					for (int j = 0; j < 3; j ++) {
+						if (board[i][j] != 'X' && board[i][j] != 'O') {
+							r = i; c = j;
+							return;
+						}
+					}
+				}
+
+			}
+			//Fill in random corner
+			else{
+				for (int i = 0; i < 3; i += 2) {
+					for (int j = 0; j < 3; j += 2) {
+						if (board[i][j] != 'X' && board[i][j] != 'O') {
+							r = i; c = j;
+							return;
+						}
 					}
 				}
 			}
@@ -263,6 +291,7 @@ bool block(int &r1, int &c1) {
 		}
 		//Block middle colum1n of row
 		if (board[i][0] == board[i][2] && board[i][2] == 'X') {
+			cout << "It tried\n";
 			r1 = i;	c1 = 1;
 			if (board[r1][c1] != 'X' && board[r1][c1] != 'O') {
 				return true;
@@ -282,14 +311,15 @@ bool block(int &r1, int &c1) {
 				return true;
 			}
 		}
-		//Block m1iddle row of column
+		//Block middle row of column
 		if (board[0][i] == board[2][i] && board[2][i] == 'X') {
-			r1 = 1;	c1 = i;
+
+			r1 = 1;	c1 = i;cout << r1 << c1 <<endl;
 			if (board[r1][c1] != 'X' && board[r1][c1] != 'O') {
 				return true;
 			}
 		}
-		//Need to block last row in colum1n
+		//Need to block last row in column
 		if (board[0][i] == board[1][i] && board[1][i] == 'X') {
 			r1 = 2;	c1 = i;
 			if (board[r1][c1] != 'X' && board[r1][c1] != 'O') {
@@ -333,7 +363,6 @@ bool block(int &r1, int &c1) {
 			return true;
 		}
 	}
-
 	return false;
 }
 
@@ -449,4 +478,3 @@ bool game_over() {
 	draw = true;
 	return true;
 }
-
