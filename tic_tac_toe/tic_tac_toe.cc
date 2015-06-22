@@ -4,6 +4,7 @@
  * Rule produced from: http://www.quora.com/Is-there-a-way-to-never-lose-at-Tic-Tac-Toe
  */
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -20,6 +21,8 @@ bool block(int &r1, int &c1);
 bool for_the_win(int &r2, int &c2);
 //Function will prove true when game is over
 bool game_over();
+//Function will keep game going until 'Q' or 'q'
+bool play_again();
 
 char turn;
 bool draw = false;
@@ -31,31 +34,31 @@ int track;
 
 int main() {
 	num = 1;
-	char quit;
+	bool quit =false;
 	cout << "Welcome to Tic Tac Toe \n";
-	do{
-	welcome();
-	while (!game_over()) {
-		display_board();
-		player_turn();
-		game_over();
-	}
+	while(!quit){
+		welcome();
+		while (!game_over()) {
+			display_board();
+			player_turn();
+			game_over();
+		}
 
-	//Game over has returned true, see who won
-	if (turn == 'O' && !draw) {
-		display_board();
-		cout << endl << endl << "Player [X] Wins! Game Over!\n";
-	} else if (turn == 'X' && !draw) {
-		display_board();
-		cout << endl << endl << "Computer [O] Wins! Game Over!\n";
-	} else {
-		display_board();
-		cout << endl << endl << "You tied. Cats game. Game Over!\n";
+		//Game over has returned true, see who won
+		if (turn == 'O' && !draw) {
+			display_board();
+			cout << endl << endl << "Player [X] Wins! Game Over!\n";
+		} else if (turn == 'X' && !draw) {
+			display_board();
+			cout << endl << endl << "Computer [O] Wins! Game Over!\n";
+		} else {
+			display_board();
+			cout << endl << endl << "You tied. Cats game. Game Over!\n";
+		}
+		play_again();
+
 	}
-	cout << "\nWould you like to play another game?\n"
-		 <<"Type any single char to continue and 'Q' to quit>>";
-	cin >> quit;
-	}while(quit != 'q' || quit != 'Q');
+	cout << "Goodbye!\n";
 }
 
 void welcome(){
@@ -88,13 +91,18 @@ void display_board() {
 }
 
 void player_turn() {
-	char cchoice;
-	int choice;
+	int choice = 0;
 	int row = 0, column = 0;
 	if (turn == 'X') {
 		cout << "Players turn [X]: ";
-		cin >> cchoice;
-		choice = cchoice - '0';
+		cin >> choice;
+		if(cin.fail()){
+			cout << "Please enter a number 1-9\n";
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			player_turn();
+		}
+
 		//Choice will be assigned a row and column, also checks if valid
 		switch (choice) {
 		case 1:
@@ -143,14 +151,22 @@ void player_turn() {
 			track = 22;
 			break;
 		default:
-			cout << "You didn't enter a correct number! Try again\n";
+			cout << "Please enter a number 1-9\n";
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			player_turn();
+			return;
 		}
 		//Checks to see if block is empty move then changes turn to 'O'
 		if (board[row][column] != 'X' && board[row][column] != 'O') {
 			board[row][column] = 'X';
 			num++;
 			turn = 'O';
+		}
+		//Returns error block is used
+		else {
+			cout << "Seat's taken! Block already used! Try again\n";
+			player_turn();
 		}
 	} else if (turn == 'O') {
 		cout << "Computer's turn [O]...\n";
@@ -163,20 +179,18 @@ void player_turn() {
 			turn = 'X';
 		}
 	}
-	//Returns error block is used
-	else {
-		cout << "Seat's taken! Block already used! Try again\n";
-		player_turn();
-	}
 
 }
 void computer_AI(int &r, int &c, int m) {
-	//Choose middle
-	if (board[1][1] != 'X' && board[1][1] != 'O') {
-		r = 1; c = 1;
-		return;
-	}
+
 	while (!for_the_win(r, c) && !block(r, c)) {
+		//Choose middle
+		if (board[1][1] != 'X' && board[1][1] != 'O') {
+			if(num !=4){
+				r = 1; c = 1;
+				return;
+			}
+		}
 		if (num == 2 && track == 11) {
 			r = 0; c = 0;
 			return;
@@ -184,7 +198,7 @@ void computer_AI(int &r, int &c, int m) {
 		if (num == 3) {
 			//Opponent takes corner, take opposite corner
 			if (track == 12 || track == 21 || track == 22) {
-				r = 0; c = 0;
+				r = 0; c =0;
 				return;
 			}
 			if (track == 1 || track == 0 || track == 10) {
@@ -203,22 +217,17 @@ void computer_AI(int &r, int &c, int m) {
 		}
 		//Pick an empty corner
 		if (num == 4) {
-			//If opponent picks corner, pick edge
-			if(track == 0 || track == 2 || track == 20 || track == 22){
-				for (int i = 0; i < 3; i ++) {
-					for (int j = 0; j < 3; j ++) {
-						if (board[i][j] != 'X' && board[i][j] != 'O') {
-							r = i; c = j;
-							return;
-						}
-					}
-				}
-
+			if (track == 0 || track == 2) {
+				r = 0; c = 1;
+				return;
 			}
-			//Fill in random corner
+			else if (track == 20 ||track == 22) {
+				r = 2; c = 1;
+				return;
+			}
 			else{
 				for (int i = 0; i < 3; i += 2) {
-					for (int j = 0; j < 3; j += 2) {
+					for (int j = 0; j < 3; j +=2) {
 						if (board[i][j] != 'X' && board[i][j] != 'O') {
 							r = i; c = j;
 							return;
@@ -291,7 +300,6 @@ bool block(int &r1, int &c1) {
 		}
 		//Block middle colum1n of row
 		if (board[i][0] == board[i][2] && board[i][2] == 'X') {
-			cout << "It tried\n";
 			r1 = i;	c1 = 1;
 			if (board[r1][c1] != 'X' && board[r1][c1] != 'O') {
 				return true;
@@ -313,8 +321,7 @@ bool block(int &r1, int &c1) {
 		}
 		//Block middle row of column
 		if (board[0][i] == board[2][i] && board[2][i] == 'X') {
-
-			r1 = 1;	c1 = i;cout << r1 << c1 <<endl;
+			r1 = 1;	c1 = i;
 			if (board[r1][c1] != 'X' && board[r1][c1] != 'O') {
 				return true;
 			}
@@ -478,3 +485,26 @@ bool game_over() {
 	draw = true;
 	return true;
 }
+bool play_again(){
+	char answer;
+	cout << "\nWould you like to play another game?\n"
+		 <<"Type ANY character to continue and 'Q' to quit>>";
+	cin >>answer;
+	if (answer == 'q' || answer =='Q'){
+		return false;
+	}
+	else{
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		char refill = '1';
+		for(int i =0; i <= 2; i++){
+			for (int j=0; j <= 2; j++){
+				board[i][j] = refill;
+				refill++;
+			}
+		}
+		num=1;
+		return true;
+	}
+}
+
