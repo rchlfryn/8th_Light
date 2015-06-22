@@ -23,6 +23,8 @@ bool for_the_win(int &r2, int &c2);
 bool game_over();
 //Function will keep game going until 'Q' or 'q'
 bool play_again();
+//True is spot is empty, flase if taken
+bool check_spot(int row3, int column3);
 
 char turn;
 bool draw = false;
@@ -172,117 +174,78 @@ void player_turn() {
 		cout << "Computer's turn [O]...\n";
 		//Calls for compuer's move
 		computer_AI(row, column, turn);
-		//Checks to see if block is empty move then changes turn to 'X'
-		if (board[row][column] != 'X' && board[row][column] != 'O') {
-			board[row][column] = 'O';
-			num++;
-			turn = 'X';
-		}
+		board[row][column] = 'O';
+		num++;
+		turn = 'X';
 	}
 
 }
 void computer_AI(int &r, int &c, int m) {
 
 	while (!for_the_win(r, c) && !block(r, c)) {
-		//Choose middle
-		if (board[1][1] != 'X' && board[1][1] != 'O') {
-			if(num !=4){
-				r = 1; c = 1;
-				return;
-			}
-		}
-		if (num == 2 && track == 11) {
-			r = 0; c = 0;
-			return;
+		if (num == 2) {
+			r = 1; c = 1;
+			if(check_spot(r,c)){return;}
 		}
 		if (num == 3) {
 			//Opponent takes corner, take opposite corner
-			if (track == 12 || track == 21 || track == 22) {
+			if (track == 12 || track == 21 || track == 22 ) {
 				r = 0; c =0;
-				return;
+				if(check_spot(r,c)){return;}
 			}
 			if (track == 1 || track == 0 || track == 10) {
 				r = 2; c = 2;
-				return;
+				if(check_spot(r,c)){return;}
 			}
 			//Opponent takes edge, take diagonal
 			if (track == 2) {
 				r = 2; c = 0;
-				return;
+				if(check_spot(r,c)){return;}
 			}
 			if (track == 20) {
 				r = 0; c = 2;
-				return;
+				if(check_spot(r,c)){return;}
 			}
 		}
-		//Pick an empty corner
+		//Pick an side then empty corner
 		if (num == 4) {
 			if (track == 0 || track == 2) {
 				r = 0; c = 1;
-				return;
+				if(check_spot(r,c)){return;}
 			}
 			else if (track == 20 ||track == 22) {
 				r = 2; c = 1;
-				return;
+				if(check_spot(r,c)){return;}
 			}
 			else{
 				for (int i = 0; i < 3; i += 2) {
 					for (int j = 0; j < 3; j +=2) {
 						if (board[i][j] != 'X' && board[i][j] != 'O') {
 							r = i; c = j;
-							return;
+							if(check_spot(r,c)){return;}
 						}
 					}
 				}
 			}
 		}
-		//Checking if opponent plays opposite side edge
-		if (num == 5
-				&& (track == 1 || track == 10 || track == 12 || track == 21)) {
-			if (track == 1) {
-				if (board[0][0] == 'O') {
-					r = 2; c = 0;
-					return;
-				} else {
-					r = 2; c = 2;
-					return;
-				}
-			}
-			if (track == 10) {
-				if (board[0][0] == 'O') {
-					r = 0; c = 2;
-					return;
-				} else {
-					r = 2; c = 2;
-					return;
-				}
-			}
-			if (track == 12) {
-				if (board[0][2] == 'O') {
-					r = 0; c = 0;
-					return;
-				} else {
-					r = 2; c = 0;
-					return;
-				}
-			}
-			if (track == 21) {
-				if (board[2][0] == 'O') {
-					r = 0; c = 0;
-					return;
-				} else {
-					r = 0; c = 2;
-					return;
-				}
-			}
-		}
 		//Fills in 'O' in next available space
-		else {
+		else{
+			for (int i = 0; i < 3; i += 2) {
+				for (int j = 0; j < 3; j +=2) {
+					if (board[i][j] != 'X' && board[i][j] != 'O') {
+						r = i; c = j;
+						if(check_spot(r,c)){return;}
+					}
+				}
+			}
+			if (check_spot(1,1)) {
+				r = 1; c = 1; return;
+			}
 			for (int i = 0; i < 3; i++) {
 				for (int j = 0; j < 3; j++) {
 					if (board[i][j] != 'X' && board[i][j] != 'O') {
 						r = i;	c = j;
-						return;
+						if(check_spot(r,c)){return;}
 					}
 				}
 			}
@@ -507,4 +470,11 @@ bool play_again(){
 		return true;
 	}
 }
-
+bool check_spot(int row3, int column3){
+	if (board[row3][column3] != 'X' && board[row3][column3] != 'O') {
+		return true;
+	}
+	else{
+		return false;
+	}
+}
