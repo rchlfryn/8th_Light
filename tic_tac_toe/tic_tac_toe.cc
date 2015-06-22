@@ -23,7 +23,7 @@ bool for_the_win(int &r2, int &c2);
 bool game_over();
 //Function will keep game going until 'Q' or 'q'
 bool play_again();
-//True is spot is empty, flase if taken
+//True is spot is empty, false if taken
 bool check_spot(int row3, int column3);
 
 char turn;
